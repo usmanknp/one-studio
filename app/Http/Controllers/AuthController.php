@@ -271,54 +271,45 @@ class AuthController extends Controller
 
     public function create_account(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+            'name' => 'required'
+        ]);
+        
+        if($validator->fails())
+        {
+            return response()->json([
+                'message' => 'Please fill all the missing fields'
+            ], 422);
+        }
+
+        if(User::where(['email' => $request->email])->count() > 0)
+        {
+            return response()->json([
+                'message' => 'Email already exist'
+            ], 422);
+        }
+
         try
         {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required',
-                'name' => 'required'
-            ]);
-          
-            if($validator->fails())
-            {
-                return response()->json([
-                    'message' => 'Please fill all the missing fields'
-                ], 422);
-            }
+            $user = new User();
+            $user->uuid = Str::uuid();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = bcrypt($request->password);
+            $user->status = 1;
+            $user->save();
+            
+            $this->set_user_permissions($user);
+            //Assign Role
+            $user->assign('user');
 
-            if(User::where(['email' => $request->email])->count() > 0)
-            {
-                return response()->json([
-                    'message' => 'Email already exist'
-                ], 422);
-            }
-
-            try
-            {
-                $user = new User();
-                $user->uuid = Str::uuid();
-                $user->name = $request->name;
-                $user->email = $request->email;
-                $user->password = bcrypt($request->password);
-                $user->status = 1;
-                $user->save();
-                
-                $this->set_user_permissions($user);
-                //Assign Role
-                $user->assign('user');
-
-                return response()->json([
-                    'message' => 'Your Account Create Successfully!'
-                ], 200);
-            }
-            catch(Exception $e)
-            {
-                return response()->json([
-                    'message' => $e->getMessage()
-                ], 422);
-            }
-
-        } catch(Exception $e)
+            return response()->json([
+                'message' => 'Your Account Create Successfully!'
+            ], 200);
+        }
+        catch(Exception $e)
         {
             return response()->json([
                 'message' => $e->getMessage()

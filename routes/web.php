@@ -69,5 +69,5 @@ Route::group(['middleware' => ['auth','role:admin|editor']], function()
 
 Route::middleware('auth')->group(function () {
     // Your protected routes here
-
+ 
 });

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Address;
 use Illuminate\Support\Str;
 use Mail;
+use App\Jobs\sendMail;
 
 class AuthController extends Controller
 {
@@ -115,6 +116,16 @@ class AuthController extends Controller
         $user->password = bcrypt($request->password);
         $user->status = 1;
         $user->save();
+
+        $sender = $user->email;
+            $subject = 'Your OnePilatesStudio account is now created';
+            $template_name = 'mail/templates/welcome_mail';
+    
+            $mail_data = array(
+                'name' => $user->name,
+            );
+           
+          dispatch(new sendMail($template_name, $mail_data, $sender, $subject));
 
         if($request->type === 'editor')
         {

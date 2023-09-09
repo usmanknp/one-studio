@@ -123,6 +123,17 @@ class ClassController extends Controller
 
     public function api_class_offer(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'offer_id' => 'required',
+        ]);
+
+        if($validator->fails())
+        {
+            return response([
+                'message' => 'All fields required'
+            ],422); 
+        }
+
         $offer = Classes::with(['instructor','offers'])->where('id',$request->id)->get();
         return response([
             'data' => $offer
@@ -133,9 +144,7 @@ class ClassController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'offer_id' => 'required',
-            'user_id' => 'required',
             'class_id' => 'required',
-            'price' => 'required'
         ]);
 
         if($validator->fails())
@@ -146,7 +155,7 @@ class ClassController extends Controller
         }
 
        $offer_save =  DB::table('classes_selected_offers')->insertGetId([
-            'user_id' => $request->user_id,
+            'user_id' => $request->user()->id,
             'offfer_id' => $request->offer_id,
             'class_id' => $request->class_id,
             'created_at' => Carbon::now(),
@@ -156,7 +165,7 @@ class ClassController extends Controller
         if($offer_save)
         {
             $offer_payment =  DB::table('classes_payments')->insert([
-                'user_id' => $request->user_id,
+                'user_id' => $request->user()->id,
                 'selected_offer_id' => $offer_save,
                 'price' => $request->price,
                 'status' => 'INITIAL',

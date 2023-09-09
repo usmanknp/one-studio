@@ -6,7 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\OfferController;
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\CouponController;
+// use App\Http\Controllers\TestController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,7 +22,7 @@ use App\Http\Controllers\TestController;
 // Route::get('/', function () {
 //     return view('dashboard');
 // });
-Route::get('test',[Testcontroller::class,'index']);
+// Route::get('test',[Testcontroller::class,'index']);
 Route::get('/',[Authcontroller::class,'login_view'])->name('user-login');
 Route::post('user-handshake',[Authcontroller::class,'user_handshake'])->name('user-handshake');
 Route::get('logout',[Authcontroller::class,'user_logout'])->name('user-logout');
@@ -57,6 +58,12 @@ Route::group(['middleware' => ['auth','role:admin|editor']], function()
     Route::get('user-list',[Authcontroller::class,'user_list']);
     Route::get('user-edit/{id}',[AuthController::class,'user_edit']);
     Route::post('user-edit',[AuthController::class,'user_update']);
+
+    Route::get('coupon-create',[CouponController::class,'coupon_create']);
+    Route::post('coupon-create',[CouponController::class,'coupon_save']);
+    Route::get('coupon-list',[CouponController::class,'coupon_list']);
+    Route::get('coupon-edit/{id}',[CouponController::class,'coupon_edit']);
+    Route::post('coupon-edit',[CouponController::class,'coupon_update']);
 });
 
 

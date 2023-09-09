@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\OrderController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,8 +26,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'class','middleware' => ['auth:sanctum']], function()
 {
 
-    Route::get("list",[ClassController::class,'api_class_list']);
-    Route::get("offer",[ClassController::class,'api_class_offer']);
+    Route::get("list",[ClassController:: class,'api_class_list']);
+    Route::post("offer",[ClassController::class,'api_class_offer']);
     Route::post("book-offer",[ClassController::class,'api_book_offer']);
     
     // Route::("offer",[ClassController::class,'api_class_offer']);
@@ -35,10 +38,12 @@ Route::group(['prefix' => 'class','middleware' => ['auth:sanctum']], function()
 
 Route::group(['middleware' => ['auth:sanctum']], function()
 {
-
     Route::post("user-logout",[AuthController::class,'api_user_logout']);
+    Route::post("user-profile",[AuthController::class,'api_user_profile']);
     Route::get("user-info",[AuthController::class,'api_user_info']);
 
+    Route::post("coupon-redeem",[CouponController::class,'api_coupon_redeem']);
+    Route::post("create-order",[OrderController::class,'api_create_order']);
 });
 
 

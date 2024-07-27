@@ -24,6 +24,7 @@ use App\Http\Controllers\CouponController;
 // });
 // Route::get('test',[Testcontroller::class,'index']);
 Route::get('/',[Authcontroller::class,'login_view'])->name('user-login');
+Route::get('/pdf',[Authcontroller::class,'generatePdf']);
 Route::post('user-handshake',[Authcontroller::class,'user_handshake'])->name('user-handshake');
 Route::get('logout',[Authcontroller::class,'user_logout'])->name('user-logout');
 

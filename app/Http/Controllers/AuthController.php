@@ -11,6 +11,7 @@ use App\Models\Address;
 use Illuminate\Support\Str;
 use Mail;
 use App\Jobs\sendMail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AuthController extends Controller
 {
@@ -125,7 +126,7 @@ class AuthController extends Controller
                 'name' => $user->name,
             );
            
-          dispatch(new sendMail($template_name, $mail_data, $sender, $subject));
+        //   dispatch(new sendMail($template_name, $mail_data, $sender, $subject));
 
         if($request->type === 'editor')
         {
@@ -409,6 +410,18 @@ class AuthController extends Controller
         return response([
             'message' => 'Something went wrong'
         ], 422);
+    }
+
+    public function generatePdf()
+    {
+        $data = [
+            'title' => 'PDF Example',
+            'content' => 'This is a sample content for the PDF.'
+        ];
+        
+        $pdf = Pdf::loadView('export_pdf.pdf', $data);
+        
+        return $pdf->download('example1.pdf');
     }
 
 }

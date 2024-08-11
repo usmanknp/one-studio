@@ -82,11 +82,11 @@
 			</a>
 			<ul id="technician" class="nav-content collapse " data-bs-parent="#sidebar-nav">
 				@if(Auth::check() && Auth::user()->roles[0]['name'] === 'admin')
-        <li>
+        <!-- <li>
 					<a href="/backend/supervisor/user-list">
 						<i class="bi bi-circle"></i><span>Supervisor</span>
 					</a>
-				</li>
+				</li> -->
 				<li>
 					<a href="/backend/technician/user-list">
 						<i class="bi bi-circle"></i><span>Technicians</span>

@@ -1,16 +1,16 @@
 <!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
 
-  <ul class="sidebar-nav" id="sidebar-nav">
+	<ul class="sidebar-nav" id="sidebar-nav">
 
-    <li class="nav-item">
-      <a class="nav-link " href="{{ url('dashboard') }}">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
-      </a>
-    </li><!-- End Dashboard Nav -->
+		<li class="nav-item">
+			<a class="nav-link " href="{{ url('dashboard') }}">
+				<i class="bi bi-grid"></i>
+				<span>Dashboard</span>
+			</a>
+		</li><!-- End Dashboard Nav -->
 
-    <li class="nav-item">
+		<!-- <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-menu-button-wide"></i><span>Classes</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
@@ -38,7 +38,7 @@
           </a>
         </li>
       </ul>
-    </li><!-- End Components Nav -->
+    </li>
 
     <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#instructor-nav" data-bs-toggle="collapse" href="#">
@@ -57,7 +57,7 @@
         </li>
 
       </ul>
-    </li><!-- End Components Nav -->
+    </li>
 
     <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#coupons-nav" data-bs-toggle="collapse" href="#">
@@ -75,10 +75,40 @@
           </a>
         </li>
       </ul>
-    </li>
+    </li> -->
+		<li class="nav-item">
+			<a class="nav-link collapsed" data-bs-target="#technician" data-bs-toggle="collapse" href="#">
+				<i class="bi bi-list"></i><span>Services</span><i class="bi bi-chevron-down ms-auto"></i>
+			</a>
+			<ul id="technician" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+				@if(Auth::check() && Auth::user()->roles[0]['name'] === 'admin')
+        <li>
+					<a href="/backend/supervisor/user-list">
+						<i class="bi bi-circle"></i><span>Supervisor</span>
+					</a>
+				</li>
+				<li>
+					<a href="/backend/technician/user-list">
+						<i class="bi bi-circle"></i><span>Technicians</span>
+					</a>
+				</li>
+				<li>
+					<a href="/backend/tasks/get-tasks">
+						<i class="bi bi-circle"></i><span>Tasks</span>
+					</a>
+				</li>
+				@endif
+				@if(Auth::check() && Auth::user()->roles[0]['name'] === 'technician')
+				<li>
+					<a href="/technician/tasks/get-tasks">
+						<i class="bi bi-circle"></i><span>Tasks</span>
+					</a>
+				</li>
+				@endif
+			</ul>
+		</li>
 
-
-    <li class="nav-item">
+		<!-- <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-gear"></i><span>Setting</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
@@ -94,8 +124,8 @@
           </a>
         </li>
       </ul>
-    </li>
-  </ul>
+    </li> -->
+	</ul>
 
 </aside>
 <!-- End Sidebar-->

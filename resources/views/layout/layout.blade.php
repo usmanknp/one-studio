@@ -27,9 +27,28 @@
   <link href="{{ asset('vendor/quill/quill.bubble.css') }}" rel="stylesheet">
   <link href="{{ asset('vendor/remixicon/remixicon.css') }}" rel="stylesheet">
   <link href="{{ asset('vendor/simple-datatables/style.css') }}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
   <!-- Template Main CSS File -->
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+  <style>
+  .label-c-style {
+  padding: 2px 4px;
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1;
+  display : inline-flex !important ;
+  color : rgba(255,255,255,0.9);
+  text-align : center;
+  border-radius : 4px;
+  background: #eee;
+}
+  </style>
 
 </head>
 
@@ -42,13 +61,12 @@
 
   <main id="main" class="main">
         @yield('content')
-  </main><!-- End #main -->
-
-  
+  </main>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script src="{{ asset('vendor/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset('vendor/chart.js/chart.umd.js') }}"></script>
@@ -57,30 +75,37 @@
   <script src="{{ asset('vendor/simple-datatables/simple-datatables.js') }}"></script>
   <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
   <script src="{{ asset('vendor/php-email-form/validate.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js" integrity="sha512-Ixzuzfxv1EqafeQlTCufWfaC6ful6WFqIz4G+dWvK0beHw0NVJwvCKSgafpy5gwNqKmgUfIBraVwkKI+Cz0SEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <!-- Template Main JS File -->
   <script src="{{ asset('js/main.js') }}"></script>
-  <script>
-  document.getElementById("add-field").addEventListener("click", function() {
-    var offersWrapper = document.getElementById("offers-wrapper");
-    var pricesWrapper = document.getElementById("prices-wrapper");
+  <script type="text/javascript">
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+        }
+        @if(session('message'))
+            toastr.success("{{ session('message') }}");
+        @endif
 
-    var offerInput = document.createElement("input");
-    offerInput.type = "text";
-    offerInput.className = "form-control";
-    offerInput.name = "offers[]";
-    offerInput.required = true;
-    offersWrapper.appendChild(offerInput);
-
-    var priceInput = document.createElement("input");
-    priceInput.type = "text";
-    priceInput.className = "form-control";
-    priceInput.name = "price[]";
-    priceInput.required = true;
-    pricesWrapper.appendChild(priceInput);
-  });
+        @if(session('error'))
+            toastr.error("{{ session('error') }}");
+        @endif
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("#datetime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+    });
 </script>
-
 </body>
-
 </html>

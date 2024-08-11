@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Address::class,'user_id','id');
     }
+
+    public function media()
+    {
+        return $this->hasMany('App\Models\Media', 'entity_id', 'id')->where('entity','user');
+    }
 }

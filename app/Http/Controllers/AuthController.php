@@ -11,7 +11,13 @@ use App\Models\Address;
 use Illuminate\Support\Str;
 use Mail;
 use App\Jobs\sendMail;
+use App\Models\Media;
+use App\Models\Tasks;
+use App\Models\TechnicianSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class AuthController extends Controller
 {
@@ -97,7 +103,11 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
-            'name' => 'required'
+            'name' => 'required',
+            'company_id' => 'required',
+            'mobile_no' => 'required',
+            'location' => 'required'
+
         ]);
 
         if($validator->fails())
@@ -109,37 +119,51 @@ class AuthController extends Controller
         {
             return redirect()->to('/user-create')->with('error','Email already exists!');
         }
-
+        DB::beginTransaction();
         $user = new User();
         $user->uuid = Str::uuid();
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->locale = 'en';
         $user->password = bcrypt($request->password);
         $user->status = 1;
+
+        if (!file_exists(public_path('/uploads/media')))
+        {
+            mkdir(public_path('/uploads/media'), 0777, true);
+        }
+
+        $filename = time().'.'.$request->file->getClientOriginalExtension();
+        $request->file->move(public_path('uploads/avatars'), $filename);
+        $user->avatar = $filename;
         $user->save();
 
-        $sender = $user->email;
-            $subject = 'Your OnePilatesStudio account is now created';
-            $template_name = 'mail/templates/welcome_mail';
+        $setting = new TechnicianSetting();
+        $setting->user_id = $user->id;
+        $setting->company_id = $request->company_id;
+        $setting->mobile_no = $request->mobile_no;
+        $setting->location = $request->location;
+        $setting->save();
+
+       
+
+        // $this->update_media($request->all(), $user->id, 'User');
+       
+        // $sender = $user->email;
+        //     $subject = 'Your OnePilatesStudio account is now created';
+        //     $template_name = 'mail/templates/welcome_mail';
     
-            $mail_data = array(
-                'name' => $user->name,
-            );
+        //     $mail_data = array(
+        //         'name' => $user->name,
+        //     );
            
         //   dispatch(new sendMail($template_name, $mail_data, $sender, $subject));
 
-        if($request->type === 'editor')
-        {
-            $this->set_editor_permissions($user);
-            //Assign Role
-            $user->assign('editor');
-            return redirect()->to('/user-create')->with('message','Editor Account create successfully!');
-        }
+        $this->set_editor_permissions($user);
+        $user->assign('technician');
+        DB::commit();
+        return redirect()->to('/user-create')->with('message','Editor Account create successfully!');
 
-        $this->set_user_permissions($user);
-            //Assign Role
-            $user->assign('user');
-            return redirect()->to('/user-create')->with('message','User Account create successfully!');
     }
 
     public function user_list()
@@ -414,14 +438,93 @@ class AuthController extends Controller
 
     public function generatePdf()
     {
-        $data = [
-            'title' => 'PDF Example',
-            'content' => 'This is a sample content for the PDF.'
-        ];
-        
-        $pdf = Pdf::loadView('export_pdf.pdf', $data);
-        
-        return $pdf->download('example1.pdf');
+
+    $public_path = public_path('/backend/files/tasks');
+    if (!File::exists($public_path))
+    {
+        File::makeDirectory($public_path, 0755, true);
     }
+
+    $task = Tasks::with('task_type','technician','created_by_user','media','task_spare_parts','task_approved_by')->where('uuid' , 'aa6dac08-9118-4879-bdbe-478e02d07873')->first();
+    $task->end_date = $task->end_date != null ? $task->end_date : date('Y-m-d H:i:s');
+    $pdf_data['task'] = $task;
+    $filename = $task->id.time().'.pdf';
+    $pdf = Pdf::loadView('export_pdf.pdf',$pdf_data);
+    $pdf->setPaper("A4", "portrait");
+    $pdf->save($public_path.'/'.$filename);
+    return url('/backend/files/tasks/'.$filename);
+
+        // $record = Tasks::with('task_type','technician','created_by_user','media','task_spare_parts','task_approved_by')->where('uuid' , '480500b9-6948-4d62-b851-d16aa621e036')->first();
+        // return $record;
+        // // return view('export_pdf.pdf');
+        // $data = [
+        //     'title' => 'PDF Example',
+        //     'content' => 'This is a sample content for the PDF.'
+        // ];
+        
+        // $pdf = Pdf::loadView('export_pdf.pdf', $data);
+        
+        // return $pdf->download('example1.pdf');
+    }
+
+    public function index()
+    {
+        return view('signaturePad');
+    }
+
+    public function upload(Request $request)
+    {
+        $folderPath = public_path('upload/');
+        
+        $image_parts = explode(";base64,", $request->signed);
+              
+        $image_type_aux = explode("image/", $image_parts[0]);
+           
+        $image_type = $image_type_aux[1];
+           
+        $image_base64 = base64_decode($image_parts[1]);
+           
+        $file = $folderPath . uniqid() . '.'.$image_type;
+        file_put_contents($file, $image_base64);
+        return back()->with('success', 'success Full upload signature');
+    }
+
+      //
+      private function update_media($request, $entity_id, $entity)
+      {
+        $inputData = $request;
+        if(!empty($inputData['files']))
+        {
+            foreach($inputData['files'] as $key => $file)
+            {
+
+                $media = new Media();
+
+                $mime_type = explode('/',$file->getMimeType());
+                $mime_type = !empty($mime_type) ? $mime_type[0] : 'file';
+                $media_type = $mime_type == 'image' || $mime_type == 'video' || $mime_type == 'file' ? $mime_type : 'file';
+
+                $filename = rand(1, 10000).''.time().'.'.$file->getClientOriginalExtension();
+                
+                if (!file_exists(public_path('/uploads/media')))
+                {
+                    mkdir(public_path('/uploads/media'), 0777, true);
+                }
+                $size=$file->getSize();
+
+                $file->move(public_path('uploads/media'), $filename);
+
+                $media->uuid = Str::uuid();
+                $media->uploaded_by = Auth::id() ? Auth::id() : null;
+                $media->entity_id = $entity_id;
+                $media->entity = $entity;
+                $media->media_type = strtoupper($media_type);
+                $media->media = $filename;
+                $media->url = url('/uploads/media/'.$filename);
+                $media->save();
+            }
+        }
+        return true;
+      }
 
 }

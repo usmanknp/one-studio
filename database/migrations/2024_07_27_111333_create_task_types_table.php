@@ -13,17 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('task_types', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid');
             $table->string('name');
-            $table->string('locale');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('avatar')->nullable();
-            $table->tinyinteger('status');
-            $table->rememberToken();
+            $table->string('label');
+            $table->string('icon')->nullable();
+            $table->string('color')->nullable();
+            $table->string('track_name')->nullable();
             $table->timestamps();
         });
     }
@@ -35,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('task_types');
     }
 };

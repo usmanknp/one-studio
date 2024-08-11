@@ -24,13 +24,14 @@ class SystemConfigurationSeeder extends Seeder
                 'title' => 'Administrator',
             ],
             [
-                'name' => 'editor',
-                'title' => 'Editor',
+                'name' => 'technician',
+                'title' => 'Technician',
             ],
             [
-                'name' => 'user',
-                'title' => 'End User',
+                'name' => 'supervisor',
+                'title' => 'Supervisor',
             ],
+        
         ];
         
         foreach ($roles as $roleData) {
@@ -42,6 +43,7 @@ class SystemConfigurationSeeder extends Seeder
           $user->uuid =Str::uuid();
           $user->name = "Admin";
           $user->email = "admin@admin.com";
+          $user->locale = "en";
           $user->password = bcrypt('password');
           $user->status = 1;
           $user->save();
